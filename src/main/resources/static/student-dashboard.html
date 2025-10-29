@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <style>
+        body {
+            background: url('student-dashboard-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 40px;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .button {
+            display: block;
+            background-color: #4CAF50;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .info {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .info p {
+            font-size: 18px;
+        }
+        .logout {
+            background-color: #f44336;
+        }
+        .logout:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Welcome to the Student Dashboard</h2>
+
+        <!-- Button to Start Exam -->
+        <a href="take-exam.html" class="button">Start Exam</a>
+
+        <!-- Button to View Exam Results -->
+        <a href="student-results.html" class="button">View Results</a>
+
+        <!-- Button to View Exam History -->
+        <a href="exam-history.html" class="button">View Exam History</a>
+
+        <!-- Button to View Upcoming Exams -->
+        <a href="upcoming-exams.html" class="button">Upcoming Exams</a>
+
+        <!-- Button to Log Out -->
+        <a href="login.html" class="button logout">Log Out</a>
+
+        <!-- Additional Info Section -->
+        <div class="info">
+            <p>Manage your exams and results from here. You can take new exams, view your past attempts, and see the upcoming exams scheduled for you.</p>
+        </div>
+    </div>
+
+    <script>
+		const username = localStorage.getItem("username");
+			  const role = localStorage.getItem("role");
+			  const email = localStorage.getItem("email");
+			
+			  // Example: Display values in console or DOM
+			  console.log("Username:", username);
+			  console.log("role", role);
+			  console.log("Email:", email);
+    </script>
+    
+</body>
+</html>

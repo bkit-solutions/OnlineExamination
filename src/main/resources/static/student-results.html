@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1584697964154-969fbc0d7210');
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            width: 80%;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            color: black;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Exam Results</h1>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Correct Answers</th>
+                    <th>Total Questions</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filled dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+		const username1 = localStorage.getItem("username");
+		  const role = localStorage.getItem("role");
+		  const email = localStorage.getItem("email");
+		
+		  const trimmedName = username1.trim();
+		  // Example: Display values in console or DOM
+		  console.log("Username;;;;:",username1);
+		  console.log("role", role);
+		  console.log("Email:", email);
+
+        document.addEventListener("DOMContentLoaded", function () {
+			fetch(`/student/results?username=${trimmedName}`) // replace with real session or param
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("resultsTable").querySelector("tbody");
+                    data.forEach(result => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${result.examId}</td>
+                            <td>${result.correctAnswers}</td>
+                            <td>${result.totalQuestions}</td>
+                            <td style="color: ${result.status === 'PASS' ? 'green' : 'red'}">
+                                ${result.status}
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Take Exam</title>
+  <style>
+    body {
+      background: url('exam-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: sans-serif;
+      padding: 30px;
+      color: white;
+    }
+    .exam-container {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 25px;
+      max-width: 800px;
+      margin: auto;
+      border-radius: 10px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .option {
+      margin: 5px 0;
+    }
+    .timer {
+      font-size: 24px;
+      text-align: right;
+    }
+    button {
+      padding: 10px 20px;
+      background: #03A9F4;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    select {
+      padding: 8px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="exam-container">
+  <h2>Select Exam</h2>
+  <select id="examDropdown">
+    <option value="">-- Select Exam --</option>
+  </select>
+
+  <div class="timer" id="timer" style="display:none;">Time Left: 00:00</div>
+
+  <form id="examForm" style="display:none;">
+    <div id="questionArea"></div>
+    <button type="submit">Submit Exam</button>
+  </form>
+</div>
+
+<script>
+  const username = (localStorage.getItem("username") || "").trim();
+  const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
+
+  let questions = [];
+  let examId = null;
+  let timerMinutes = 30;
+
+  function loadExamDropdown() {
+    fetch(`/student/student/exams?username=${username}`)
+      .then(res => res.json())
+      .then(exams => {
+        const dropdown = document.getElementById('examDropdown');
+        dropdown.innerHTML = '<option value="">-- Select Exam --</option>';
+
+        if (!Array.isArray(exams) || exams.length === 0) {
+          const msgOption = document.createElement('option');
+          msgOption.value = "";
+          msgOption.textContent = "No more exams available";
+          msgOption.disabled = true;
+          dropdown.appendChild(msgOption);
+          dropdown.disabled = true;
+        } else {
+          exams.forEach(exam => {
+            const option = document.createElement('option');
+            option.value = exam.id;
+            option.textContent = exam.title;
+            dropdown.appendChild(option);
+          });
+          dropdown.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error("Failed to load exams:", error);
+        alert("Error fetching exams.");
+      });
+  }
+
+  document.getElementById('examDropdown').addEventListener('change', function () {
+    examId = this.value;
+    if (examId) {
+      fetchQuestions(examId);
+    }
+  });
+
+  function fetchQuestions(examId) {
+    fetch(`/student/student/exam/${examId}/questions`)
+      .then(res => res.json())
+      .then(data => {
+        questions = data;
+        if (questions.length > 0) {
+          timerMinutes = questions.length;
+          document.getElementById('timer').style.display = 'block';
+          document.getElementById('examForm').style.display = 'block';
+          displayQuestions();
+          startTimer(timerMinutes * 60);
+        } else {
+          alert("No questions found for this exam.");
+        }
+      })
+      .catch(err => {
+        console.error("Error loading questions:", err);
+        alert("Failed to load questions.");
+      });
+  }
+
+  function displayQuestions() {
+    const area = document.getElementById("questionArea");
+    area.innerHTML = "";
+    questions.forEach((q, i) => {
+      const questionHTML = `
+        <div class="question">
+          <p><strong>Q${i + 1}:</strong> ${q.questionText}</p>
+          <div class="option"><label><input type="radio" name="q${i}" value="A"> ${q.optionA}</label></div>
+          <div class="option"><label><input type="radio" name="q${i}" value="B"> ${q.optionB}</label></div>
+          <div class="option"><label><input type="radio" name="q${i}" value="C"> ${q.optionC}</label></div>
+          <div class="option"><label><input type="radio" name="q${i}" value="D"> ${q.optionD}</label></div>
+          <input type="hidden" name="qid${i}" value="${q.id}">
+        </div>
+      `;
+      area.innerHTML += questionHTML;
+    });
+  }
+
+  function startTimer(seconds) {
+    let timer = seconds;
+    const timerDisplay = document.getElementById("timer");
+    const interval = setInterval(() => {
+      const mins = Math.floor(timer / 60);
+      const secs = timer % 60;
+      timerDisplay.innerText = `Time Left: ${mins}:${secs < 10 ? "0" : ""}${secs}`;
+      if (--timer < 0) {
+        clearInterval(interval);
+        document.getElementById("examForm").submit();
+      }
+    }, 1000);
+  }
+
+  document.getElementById("examForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const answers = [];
+
+    for (let i = 0; i < questions.length; i++) {
+      const questionId = document.querySelector(`input[name=qid${i}]`).value;
+      const selectedOption = document.querySelector(`input[name=q${i}]:checked`);
+      answers.push({
+        questionId: parseInt(questionId),
+        selectedOption: selectedOption ? selectedOption.value : ""
+      });
+    }
+
+    fetch(`/student/student/submit-exam/${examId}`, {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: username,
+        answers: answers
+      })
+    })
+      .then(res => {
+        if (!res.ok) {
+          return res.text().then(msg => { throw new Error(msg); });
+        }
+        return res.text();
+      })
+      .then(msg => {
+        alert("Exam Submitted!\n" + msg);
+        window.location.href = "student-dashboard.html";
+      })
+      .catch(err => {
+        console.error("Submission failed:", err);
+        alert(err.message || "Failed to submit exam.");
+      });
+  });
+
+  // Initialize on page load
+  loadExamDropdown();
+</script>
+
+</body>
+</html>

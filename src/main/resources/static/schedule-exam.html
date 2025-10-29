@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Schedule Exam</title>
+    <style>
+        body {
+            background: url('exam-schedule-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            color: white;
+        }
+        .container {
+            background-color: rgba(0, 0, 0, 0.75);
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Schedule an Exam</h2>
+        <form id="scheduleExamForm">
+            <input type="text" name="examTitle" id="examTitle" placeholder="Exam Title" required>
+            <input type="datetime-local" name="startTime" id="startTime" required>
+            <input type="number" name="durationMinutes" id="durationMinutes" placeholder="Duration (minutes)" required>
+            <button type="submit">Schedule Exam</button>
+        </form>
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('scheduleExamForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Collect the form data
+            const examTitle = document.getElementById("examTitle").value;
+            const startTime = document.getElementById("startTime").value;
+            const durationMinutes = document.getElementById("durationMinutes").value;
+
+            // Create URLSearchParams object to send data as x-www-form-urlencoded
+            const formData = new URLSearchParams();
+            formData.append("examTitle", examTitle);
+            formData.append("startTime", startTime);
+            formData.append("durationMinutes", durationMinutes);
+
+            // Send POST request to backend
+            fetch('/schedule-exam', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded' // Ensure the content type is URL encoded
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    // On success, redirect the user to the admin dashboard
+                    window.location.href = 'admin-dashboard.html';
+                } else {
+                    response.text().then(text => {
+                        document.getElementById('errorMessage').textContent = text; // Display error message from the backend
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('errorMessage').textContent = 'An error occurred while scheduling the exam.';
+                console.error('Error:', error); // Log error for debugging
+            });
+        });
+    </script>
+</body>
+</html>

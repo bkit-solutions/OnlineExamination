@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Teacher</title>
+    <style>
+        body {
+            background: url('teacher-bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+            padding: 50px;
+        }
+        .form-box {
+            background-color: rgba(0, 0, 0, 0.6);
+            max-width: 500px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        input, button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        h2 {
+            text-align: center;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>Create Teacher</h2>
+        <form id="createTeacherForm">
+            <input type="text" name="name" id="name" placeholder="Full Name" required>
+            <input type="email" name="email" id="email" placeholder="Email ID" required>
+            <input type="text" name="username" id="username" placeholder="Username" required>
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <button type="submit">Add Teacher</button>
+        </form>
+        <div class="error" id="errorMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('createTeacherForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this); // Gather form data
+
+            // Prepare data to be sent in the request body
+            const urlEncodedData = new URLSearchParams();
+            for (const [key, value] of formData.entries()) {
+                urlEncodedData.append(key, value);
+            }
+
+            // Sending the POST request to backend
+            fetch('/add-teacher', { // Make sure the backend endpoint matches the route
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded' // Send as URL-encoded form data
+                },
+                body: urlEncodedData
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Teacher created successfully!');
+                    window.location.href = "admin-dashboard.html"; // Redirect to the admin dashboard or another page
+                } else {
+                    response.text().then(text => {
+                        document.getElementById('errorMessage').textContent = text; // Show the error message
+                    });
+                }
+            })
+            .catch(error => {
+                document.getElementById('errorMessage').textContent = 'An error occurred while creating the teacher.';
+                console.error('Error:', error); // Log error for debugging
+            });
+        });
+    </script>
+</body>
+</html>

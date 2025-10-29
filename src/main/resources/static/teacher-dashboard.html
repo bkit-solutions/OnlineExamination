@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1603575448374-4b547db00f46');
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            width: 90%;
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            color: black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #28a745;
+            color: white;
+        }
+
+        input[type="text"] {
+            width: 60px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 6px 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teacher Dashboard - Grade Student Submissions</h1>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Student Username</th>
+                    <th>Exam ID</th>
+                    <th>Correct Answers</th>
+                    <th>Total Questions</th>
+                    <th>Status</th>
+                    <th>Assign Grade</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic Rows -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/teacher/view-submissions') // Adjust path if needed
+                .then(res => res.json())
+                .then(data => {
+                    const tbody = document.getElementById('resultsTable').querySelector('tbody');
+                    data.forEach(result => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${result.studentUsername}</td>
+                            <td>${result.examId}</td>
+                            <td>${result.correctAnswers}</td>
+                            <td>${result.totalQuestions}</td>
+                            <td style="color: ${result.status === 'PASS' ? 'green' : 'red'}">${result.status}</td>
+                            <td>
+                                <input type="text" id="grade-${result.id}" placeholder="A/B/C/Fail" />
+                            </td>
+                            <td>
+                                <button onclick="assignGrade(${result.id})">Submit</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                });
+        });
+
+        function assignGrade(resultId) {
+            const grade = document.getElementById(`grade-${resultId}`).value;
+            fetch('/teacher/assign-grade', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resultId, grade })
+            })
+            .then(res => res.text())
+            .then(msg => alert(msg))
+            .catch(err => alert("Error assigning grade"));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Exam</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1581093588401-9d51c3dfc295') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      background-color: rgba(255,255,255,0.9);
+      padding: 20px;
+      margin: 50px auto;
+      width: 50%;
+      border-radius: 12px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Create Exam</h2>
+  <form id="examForm">
+    <label>Exam Title</label>
+    <input type="text" id="title" required>
+    <label>Duration (in minutes)</label>
+    <input type="number" id="duration" required>
+    <button type="submit">Create Exam</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("examForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const data = {
+      title: document.getElementById("title").value,
+      durationInMinutes: document.getElementById("duration").value
+    };
+
+    fetch("/admin/create-exam", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(msg => alert(msg));
+  });
+</script>
+</body>
+</html>

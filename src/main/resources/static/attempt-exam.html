@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Attempt Exam</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1511974035430-5de47d3b95da') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.95);
+      padding: 30px;
+      margin: 30px auto;
+      max-width: 700px;
+      border-radius: 15px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .question {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .options label {
+      display: block;
+      margin: 5px 0;
+    }
+
+    #timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+      text-align: right;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: darkblue;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Attempt Exam</h2>
+  <div id="timer">Time Remaining: <span id="time">--:--</span></div>
+  <form id="examForm"></form>
+  <button onclick="submitExam()">Submit Exam</button>
+</div>
+
+<script>
+  const examId = localStorage.getItem("selectedExamId") || 1; // Replace with dynamic exam ID
+  let timeLeft = 300; // 5 minutes for example
+
+  function startTimer() {
+    const timerEl = document.getElementById("time");
+    const countdown = setInterval(() => {
+      let minutes = Math.floor(timeLeft / 60);
+      let seconds = timeLeft % 60;
+      timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      timeLeft--;
+
+      if (timeLeft < 0) {
+        clearInterval(countdown);
+        submitExam();
+      }
+    }, 1000);
+  }
+
+  function loadQuestions() {
+    fetch(`/student/exam/${examId}/questions`)
+      .then(res => res.json())
+      .then(data => {
+        const form = document.getElementById("examForm");
+        data.forEach((q, index) => {
+          const div = document.createElement("div");
+          div.className = "question";
+          div.innerHTML = `
+            <p><strong>Q${index + 1}:</strong> ${q.questionText}</p>
+            <div class="options">
+              <label><input type="radio" name="q${q.id}" value="A"> ${q.optionA}</label>
+              <label><input type="radio" name="q${q.id}" value="B"> ${q.optionB}</label>
+              <label><input type="radio" name="q${q.id}" value="C"> ${q.optionC}</label>
+              <label><input type="radio" name="q${q.id}" value="D"> ${q.optionD}</label>
+            </div>
+          `;
+          form.appendChild(div);
+        });
+      });
+  }
+
+  function submitExam() {
+    const form = document.getElementById("examForm");
+    const inputs = form.querySelectorAll("input[type=radio]:checked");
+    let answers = [];
+
+    inputs.forEach(input => {
+      answers.push({
+        questionId: parseInt(input.name.substring(1)),
+        selectedOption: input.value
+      });
+    });
+
+    fetch(`/student/submit-exam/${examId}`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(answers)
+    })
+    .then(res => res.text())
+    .then(msg => {
+      alert(msg);
+      window.location.href = "student-dashboard.html";
+    });
+  }
+
+  window.onload = () => {
+    loadQuestions();
+    startTimer();
+  };
+</script>
+
+</body>
+</html>

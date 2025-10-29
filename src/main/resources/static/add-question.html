@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Question</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1596495577886-d920f1fb7238') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      background-color: rgba(255,255,255,0.95);
+      padding: 20px;
+      margin: 40px auto;
+      width: 60%;
+      border-radius: 10px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: green;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>Add Question to Exam</h2>
+  <form id="questionForm">
+    <label>Exam ID</label>
+    <input type="number" id="examId" required>
+
+    <label>Question Text</label>
+    <textarea id="questionText" required></textarea>
+
+    <label>Option A</label>
+    <input type="text" id="optionA" required>
+    <label>Option B</label>
+    <input type="text" id="optionB" required>
+    <label>Option C</label>
+    <input type="text" id="optionC" required>
+    <label>Option D</label>
+    <input type="text" id="optionD" required>
+
+    <label>Correct Option (A/B/C/D)</label>
+    <input type="text" id="correctAnswer" required>
+
+    <button type="submit">Add Question</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("questionForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const examId = document.getElementById("examId").value;
+    const data = {
+      questionText: document.getElementById("questionText").value,
+      optionA: document.getElementById("optionA").value,
+      optionB: document.getElementById("optionB").value,
+      optionC: document.getElementById("optionC").value,
+      optionD: document.getElementById("optionD").value,
+	  correctAnswer: document.getElementById("correctAnswer").value.toUpperCase()
+    };
+
+    fetch("/admin/add-question/" + examId, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(res => res.text())
+    .then(msg => alert(msg));
+  });
+</script>
+</body>
+</html>

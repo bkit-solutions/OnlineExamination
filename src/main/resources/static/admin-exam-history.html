@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Exam History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1501594907357-9f1c80c2efb1');
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            width: 80%;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            color: black;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        .btn {
+            padding: 6px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Exam History</h1>
+        <table id="examHistoryTable">
+            <thead>
+                <tr>
+                    <th>Exam ID</th>
+                    <th>Exam Title</th>
+                    <th>Total Students</th>
+                    <th>Passed</th>
+                    <th>Failed</th>
+                    <th>View Results</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows will be added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/api/admin/exams') // Endpoint to fetch all exams and their results
+                .then(response => response.json())
+                .then(exams => {
+                    const tableBody = document.getElementById("examHistoryTable").querySelector("tbody");
+                    exams.forEach(exam => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${exam.examId}</td>
+                            <td>${exam.examTitle}</td>
+                            <td>${exam.totalStudents}</td>
+                            <td>${exam.passed}</td>
+                            <td>${exam.failed}</td>
+                            <td><button class="btn" onclick="viewResults(${exam.examId})">View Results</button></td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                });
+        });
+
+        function viewResults(examId) {
+            window.location.href = `/admin/exam-results/${examId}`; // Redirect to exam result details page
+        }
+    </script>
+</body>
+</html>
