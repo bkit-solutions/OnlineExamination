@@ -40,6 +40,17 @@ Apache Maven (for dependency management and building)
 
 MySQL Database (e.g., MySQL Workbench or a similar client)
 
+Key Project Dependencies (Added via STS Initializer):
+The project is built using the following core Spring Boot dependencies, which are typically included when creating the project in Spring Tool Suite (STS) or using the Spring Initializr:
+
+Spring Data JPA: Used for interacting with the MySQL database via ORM (Object-Relational Mapping).
+
+Spring Web (MVC): Enables the creation of the web application, handling requests, and defining RESTful endpoints.
+
+MySQL Driver (Connector/J): The JDBC driver necessary to connect the Spring application to the MySQL database.
+
+Spring Boot DevTools: Provides development-time features like automatic application restarts upon code changes.
+
 ⚙️ Installation and Setup
 
 1. Database Setup
@@ -53,11 +64,8 @@ Create the required database as specified for this project:
 CREATE DATABASE online_examination;
 
 
-Execute the provided SQL script to set up the tables and initial data:
 
-Locate the file exam_portal.sql (or similar schema file) in the project root.
 
-Run the contents of this file against the newly created online_examination database.
 
 2. Configuration Update
 
@@ -68,12 +76,18 @@ Navigate to the configuration file:
 src/main/resources/application.properties
 
 
+
+
+
 Find the following lines related to MySQL connection and update them to match your local setup. Ensure the database name matches online_examination.
 
 # Database Configuration Properties
 spring.datasource.url=jdbc:mysql://localhost:3306/online_examination
 spring.datasource.username=root
 spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
+
+
+
 
 
 3. Build and Run
